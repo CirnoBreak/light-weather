@@ -1,5 +1,4 @@
 <script>
-// const config = require('./config')
 import { env } from './config'
 
 export default {
@@ -11,7 +10,6 @@ export default {
         traceUser: true,
         env
       })
-      console.log('oook')
     }
   }
 }

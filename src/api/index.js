@@ -1,14 +1,21 @@
-import promise from 'es6-promise'
-// 配置文件，包括各种key
-import { QQ_MAP_KEY } from'../config/index'
-// 腾讯地图sdk
-import qqmapWx from '../utils/qqmap-wx-jssdk'
+/**
+ * api接口页面
+ */
+
+import { QQ_MAP_KEY } from '../config/index'
 // 请求库
 import Fly from 'flyio/dist/npm/wx'
+const fly = new Fly()
 
-const fly = new Fly();
-
-//初始化腾讯地图
-const qqmapsdk = new qqmapWx({
-  key: QQ_MAP_KEY
-});
+/**
+ * 逆地址解析(经纬度 => 真实地址)
+ * @param {number} lat 纬度
+ * @param {number} lng 经度
+ */
+export const geocoder = (lat, lng) => {
+  return fly.get('https://apis.map.qq.com/ws/geocoder/v1/', {
+    location: `${lat},${lng}`,
+    key: QQ_MAP_KEY,
+    get_poi: 0
+  })
+}

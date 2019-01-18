@@ -34,6 +34,11 @@ export default {
           this.getAddress(latitude, longitude)
         },
         fail: (err) => {
+          wx.showToast({
+            title: '请开启地理位置权限😄',
+            icon: 'none',
+            duration: 2000
+          })
           console.log(err)
         }
       })
@@ -80,11 +85,17 @@ export default {
 
         /* eslint-enable */
         this.address = address
+        console.log('ok')
       } catch (e) {
         this.address = '北京市海淀区彩和坊路海淀西大街74号'
-      } finally {
-        wx.hideLoading()
       }
+    },
+
+    getWeather () {
+      wx.showLoading({
+        title: '正在获取数据，请稍等...',
+        mask: true
+      })
     }
   }
 }

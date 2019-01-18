@@ -4,8 +4,7 @@
 
 import { QQ_MAP_KEY } from '../config/index'
 // 请求库
-import Fly from 'flyio/dist/npm/wx'
-const fly = new Fly()
+import fly from '../utils/http'
 
 /**
  * 逆地址解析(经纬度 => 真实地址)

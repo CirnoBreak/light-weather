@@ -8,10 +8,16 @@ fly.interceptors.request.use((req) => {
 
 fly.interceptors.response.use((res) => {
   wx.hideLoading()
+  console.log('hi', res)
   return res
 }, (err) => {
   console.log(err)
   wx.hideLoading()
+  wx.showToast({
+    title: '网络错误',
+    duration: 1000,
+    icon: 'none'
+  })
   if (err.status === 0) {
     return '网络连接异常'
   } else if (err.status === 1) {

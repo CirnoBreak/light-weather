@@ -8,9 +8,32 @@
           <w-icon type="dingwei"></w-icon>
           <span>{{ address }}</span>
         </div>
+        <!-- 空气质量 -->
         <div v-if="air && air.aqi" class="air" :style="{ background: air.color}">
           <div>{{ air.aqi }}</div>
-          <div>{{ air.qlty }}</div>
+          <div class="qlty">{{ air.qlty }}</div>
+        </div>
+        <!-- 当前天气 -->
+        <div class="current-weather">
+          <div class="tmp">
+            <span class="text">{{ current.tmp }}</span>
+            <span class="text degree">°</span>
+          </div>
+          <div class="cur-weather">
+            <div class="inline">
+              <w-icon :type="current.icon"></w-icon>
+              <span> {{ current.cond_txt }}</span>
+            </div>
+            <div class="inline today">
+              <div class="item">
+                {{ current.wind_dir }} {{ windLevel }}
+              </div>
+              <span class="item">{{ humidity }}</span>
+            </div>
+            <div class="inline tips">
+              {{ tips }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -22,6 +45,7 @@
  * 天气主页
  */
 import { geocoder, fetchWeather, fetchAir } from '@/api/'
+import { airBackgroundColor, getIconNameByCode, isNight, getTips } from '@/utils/'
 import WIcon from '@/components/icon/icon.vue'
 
 export default {
@@ -41,7 +65,11 @@ export default {
       scale: 1,
       paddingTop: 0,
       air: null,
-      airLevel: ''
+      airLevel: '',
+      current: {
+        tmp: 0
+      },
+      tips: getTips()
     }
   },
   onLoad () {
@@ -57,7 +85,20 @@ export default {
     })
     this.getLocation()
   },
-
+  computed: {
+    humidity () {
+      let h = this.current.hum
+      return h ? `湿度${h}%` : h || ''
+    },
+    windLevel () {
+      let level = this.current.wind_sc
+      if (level === '1-2') {
+        return '微风'
+      } else {
+        return level ? `${level}级` : ''
+      }
+    }
+  },
   methods: {
     /**
      * 自定义loading文字
@@ -151,20 +192,6 @@ export default {
       }
     },
 
-    airBackgroundColor (aqi) {
-      if (aqi < 50) {
-        return '#a3d765'
-      } else if (aqi < 100) {
-        return '#f0cc35'
-      } else if (aqi < 150) {
-        return '#f1ab62'
-      } else if (aqi < 200) {
-        return '#e03131'
-      } else if (aqi > 300) {
-        return '#ff6600'
-      }
-    },
-
     /**
      * 获取实况天气数据
      */
@@ -175,12 +202,24 @@ export default {
         fetchWeather(lat, lng),
         fetchAir(city)
       ])
+      // 常规天气数据
       const { HeWeather6: weatherData } = weatherRes.data
+      // 空气质量数据
       const { HeWeather6: airData } = airRes.data
+      // 现在的天气数据、天气预报
+      const { now, daily_forecast: dailyForcast } = weatherData[0]
+      // 今天的日出日落时间
+      const { sr, ss } = dailyForcast[0]
+      // 现在的时间(时)
+      const hour = (new Date()).getHours()
+      this.current = {
+        ...now,
+        icon: getIconNameByCode(now.cond_code, isNight(hour, sr, ss))
+      }
       console.log(weatherData)
       console.log(airRes)
       const air = airData[0]['air_now_city']
-      this.air = {...air, color: this.airBackgroundColor(air.aqi)}
+      this.air = { ...air, color: airBackgroundColor(air.aqi) }
     }
   }
 }
@@ -210,9 +249,8 @@ export default {
     display: flex;
     flex-direction: column;
     top: 100rpx;
-    left: 20rpx;
     height: 70rpx;
-    padding: 5rpx 20rpx;
+    padding: 5rpx 25rpx;
     text-align: center;
     border-radius: 13rpx;
     font-size: 20rpx;
@@ -220,6 +258,48 @@ export default {
       color: #fff;
       vertical-align: middle;
       line-height: 35rpx;
+    }
+    .qlty {
+      font-size: 25rpx;
+    }
+  }
+  .current-weather {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    transform: translateY(-50%);
+    .tmp .text {
+      font-size: 256rpx;
+    }
+    .cur-weather {
+      position: relative;
+      margin-bottom: 40rpx;
+      .today {
+        display: flex;
+        flex-direction: row;
+        margin-top: 10rpx;
+        .item {
+          display: block;
+          padding-right: 16rpx;
+          margin: 0 16rpx 0 0;
+          border-right: 1px solid #ccc;
+          font-size: 28rpx;
+          flex: 1;
+          text-align: right;
+          &:last-child {
+            text-align: left;
+            border: none;
+            padding: 0;
+            margin: 0;
+          }
+        }
+      }
+      .tips {
+        font-size: 25rpx;
+        margin-top: 30rpx;
+      }
     }
   }
 }

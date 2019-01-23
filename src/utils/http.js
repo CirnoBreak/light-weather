@@ -8,7 +8,6 @@ fly.interceptors.request.use((req) => {
 
 fly.interceptors.response.use((res) => {
   wx.hideLoading()
-  console.log('hi', res)
   return res
 }, (err) => {
   console.log(err)

@@ -10,6 +10,8 @@ import fly from '../utils/http'
 const hfApi = 'https://free-api.heweather.com/s6'
 // 腾讯地图api
 const mapApi = 'https://apis.map.qq.com/ws/geocoder/v1/'
+// QQ天气api
+const qqwApi = 'https://wis.qq.com/weather/common'
 
 /**
  * 逆地址解析(经纬度 => 真实地址)
@@ -70,4 +72,14 @@ export const fetchAir = (city) => {
     key: weatherKey
   }
   return fly.get(`${hfApi}/air`, params)
+}
+
+export const fetchForecast = (province, city) => {
+  const params = {
+    province,
+    city,
+    source: 'pc',
+    weather_type: 'forecast_1h|forecast_24h'
+  }
+  return fly.get(`${qqwApi}`, params)
 }

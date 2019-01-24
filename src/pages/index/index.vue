@@ -59,6 +59,7 @@
         </div>
         </div>
       </div>
+      <!--  -->
     </div>
   </div>
 </template>
@@ -67,8 +68,18 @@
 /**
  * 天气主页
  */
-import { geocoder, fetchWeather, fetchAir } from '@/api/'
-import { airBackgroundColor, getIconNameByCode, isNight, getTips } from '@/utils/'
+import {
+  geocoder,
+  fetchWeather,
+  fetchAir,
+  fetchForecast
+} from '@/api/'
+import {
+  airBackgroundColor,
+  getIconNameByCode,
+  isNight,
+  getTips
+} from '@/utils/'
 import WIcon from '@/components/icon/icon.vue'
 
 export default {
@@ -102,13 +113,14 @@ export default {
         tmp: '',
         icon: '',
         weather: ''
-      }
+      },
+      hourly: [],
+      weekly: []
     }
   },
   onLoad () {
     wx.getSystemInfo({
       success: (res) => {
-        console.log(res)
         let width = res.windowWidth
         let scale = width / 375
         this.width = width
@@ -258,10 +270,11 @@ export default {
      */
     async getWeather () {
       this.customLoading('获取天气数据中...')
-      const { lat, lng, city } = this
-      const [weatherRes, airRes] = await Promise.all([
+      const { lat, lng, city, province } = this
+      const [weatherRes, airRes, forecastRes] = await Promise.all([
         fetchWeather(lat, lng),
-        fetchAir(city)
+        fetchAir(city),
+        fetchForecast(province, city)
       ])
       // 常规天气数据
       const { HeWeather6: weatherData } = weatherRes.data
@@ -286,6 +299,14 @@ export default {
       console.log(airRes)
       const air = airData[0]['air_now_city']
       this.air = { ...air, color: airBackgroundColor(air.aqi) }
+      const { data: { data: forecasts } } = forecastRes
+      const { forecast_1h: hourly, forecast_24h: weekly } = forecasts
+      console.log('for', hourly)
+      console.log(Object.values(hourly).reduce((a, b) => [...a, b], []))
+      const hour24 = Object.values(hourly).reduce((a, b) => [...a, b], []).slice(0, 24)
+      const week7 = Object.values(weekly).reduce((a, b) => [...a, b], [])
+      this.hourly = hour24
+      this.weekly = week7
     }
   }
 }

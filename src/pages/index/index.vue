@@ -35,6 +35,29 @@
             </div>
           </div>
         </div>
+        <!-- 今明两日天气 -->
+        <div class="two-days">
+          <div class="item">
+            <div class="top">
+              <span class="date">今天</span>
+              <span class="tmp">{{ today.tmp }}</span>
+            </div>
+            <div class="bottom">
+              <span class="text">{{ today.weather }}</span>
+              <w-icon :type="today.icon"></w-icon>
+            </div>
+        </div>
+        <div class="item">
+          <div class="top">
+            <span class="date">明天</span>
+            <span class="tmp">{{ tomorrow.tmp }}</span>
+          </div>
+          <div class="bottom">
+            <span class="text">{{ tomorrow.weather }}</span>
+            <w-icon :type="tomorrow.icon"></w-icon>
+          </div>
+        </div>
+        </div>
       </div>
     </div>
   </div>
@@ -69,7 +92,17 @@ export default {
       current: {
         tmp: 0
       },
-      tips: getTips()
+      tips: getTips() || '',
+      today: {
+        tmp: '',
+        icon: '',
+        weather: ''
+      },
+      tomorrow: {
+        tmp: '',
+        icon: '',
+        weather: ''
+      }
     }
   },
   onLoad () {
@@ -193,6 +226,34 @@ export default {
     },
 
     /**
+     * 获取今明两日数据
+     * @param {Object} data 天气数据
+     */
+    getTwoDay (data) {
+      const { daily_forecast: dailyForcast } = data
+      const todayData = dailyForcast[0]
+      const tomorrowData = dailyForcast[1]
+      const _isNight = isNight((new Date()).getHours())
+      const getIcon = (day) => {
+        return _isNight ? getIconNameByCode(day.cond_code_n) : getIconNameByCode(day.cond_code_d)
+      }
+      const getWeather = (day) => {
+        return _isNight ? day.cond_txt_n : day.cond_txt_d
+      }
+      const getData = (day) => {
+        return {
+          tmp: `${day.tmp_max}/${day.tmp_min}°C`,
+          icon: getIcon(day),
+          weather: getWeather(day)
+        }
+      }
+      const today = getData(todayData)
+      const tomorrow = getData(tomorrowData)
+      this.today = today
+      this.tomorrow = tomorrow
+    },
+
+    /**
      * 获取实况天气数据
      */
     async getWeather () {
@@ -216,6 +277,11 @@ export default {
         ...now,
         icon: getIconNameByCode(now.cond_code, isNight(hour, sr, ss))
       }
+
+      if (weatherData) {
+        this.getTwoDay(weatherData[0])
+      }
+
       console.log(weatherData)
       console.log(airRes)
       const air = airData[0]['air_now_city']
@@ -226,10 +292,19 @@ export default {
 </script>
 
 <style lang="less">
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
 .current {
   height: 560rpx;
   overflow: hidden;
   position: relative;
+  border: 1px solid #000;
   .loc {
     text-align: center;
     font-size: 26rpx;
@@ -246,9 +321,8 @@ export default {
   }
   .air {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    top: 100rpx;
+    .flex-column();
+    top: 104rpx;
     height: 70rpx;
     padding: 5rpx 25rpx;
     text-align: center;
@@ -271,14 +345,13 @@ export default {
     text-align: center;
     transform: translateY(-50%);
     .tmp .text {
-      font-size: 256rpx;
+      font-size: 156rpx;
     }
     .cur-weather {
       position: relative;
       margin-bottom: 40rpx;
       .today {
-        display: flex;
-        flex-direction: row;
+        .flex-row();
         margin-top: 10rpx;
         .item {
           display: block;
@@ -300,6 +373,35 @@ export default {
         font-size: 25rpx;
         margin-top: 30rpx;
       }
+    }
+  }
+}
+.two-days {
+  .flex-row();
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  top: 75%;
+  bottom: 0;
+  margin-bottom: 0;
+  .item {
+    width: 50%;
+    border-right: 1px solid #ccc;
+    &:last-child {
+      border-right: none;
+    }
+    .top {
+      height: 24rpx;
+      margin-bottom: 26rpx;
+      margin-right: -20rpx;
+    }
+    .date, .text {
+      float: left;
+      margin-left: 10rpx;
+    }
+    .tmp, .icon {
+      float: right;
+      margin-right: 30rpx;
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapp">
+  <div class="wrapper">
     <div class="container" :style="{ paddingTop: paddingTop + 'px' }">
       <!-- 实时天气 -->
       <div class="current">
@@ -46,30 +46,57 @@
               <span class="text">{{ today.weather }}</span>
               <w-icon :type="today.icon"></w-icon>
             </div>
-        </div>
-        <div class="item">
-          <div class="top">
-            <span class="date">明天</span>
-            <span class="tmp">{{ tomorrow.tmp }}</span>
           </div>
-          <div class="bottom">
-            <span class="text">{{ tomorrow.weather }}</span>
-            <w-icon :type="tomorrow.icon"></w-icon>
+          <div class="item">
+            <div class="top">
+              <span class="date">明天</span>
+              <span class="tmp">{{ tomorrow.tmp }}</span>
+            </div>
+            <div class="bottom">
+              <span class="text">{{ tomorrow.weather }}</span>
+              <w-icon :type="tomorrow.icon"></w-icon>
+            </div>
           </div>
-        </div>
         </div>
       </div>
-      <!-- 逐小时天气与七天天气预报 -->
-      <div class="forecast">
-        <div class="forecast-hour-container">
-          <scroll-view scroll-x>
-            <div class="scroll-x">
-              <div class="item" v-for="(item, idx) in hourly" :key="idx">
-                <div class="time">{{ item.update_time }}</div>
-                <w-icon :type="item.weather_code"></w-icon>
-              </div>
+    </div>
+    <!-- 逐小时天气与七天天气预报 -->
+    <div class="forecast">
+      <!-- 逐小时天气预报 -->
+      <div class="forecast-hour-container">
+        <scroll-view scroll-x>
+          <div class="scroll-x">
+            <div class="item" v-for="(item, idx) in hourly" :key="idx">
+              <div class="time">{{ item.update_time }}</div>
+              <w-icon :type="item.weather_code"></w-icon>
+              <div class="tmp">{{ item.degree }}°C</div>
             </div>
-          </scroll-view>
+          </div>
+        </scroll-view>
+      </div>
+      <!-- 七天天气预报 -->
+      <div class="forecast-week-container">
+        <div class="week">
+          <div class="week-weather">
+            <div class="item" v-for="(item, index) in weekly" :key="index">
+              <div class="day">今天</div>
+              <div class="date">01/30</div>
+              <div class="daytime">
+                <div class="weather-text">{{item.day_weather}}</div>
+                <w-icon :type="item.day_weather_code"></w-icon>
+              </div>
+              <div class="night">
+                <w-icon :type="item.night_weather_code"></w-icon>
+                <div class="weather-text">{{item.night_weather}}</div>
+              </div>
+              <div class="wind">{{ item.day_wind_direction }}</div>
+              <div class="wind">{{ item.night_wind_direction }}</div>
+            </div>
+          </div>
+          <!-- 一周温度走势图 -->
+          <div class="week-chart">
+            <canvas canvas-id="chart" id="chart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -298,9 +325,10 @@ export default {
       const { sr, ss } = dailyForcast[0]
       // 现在的时间(时)
       const hour = (new Date()).getHours()
+      const _isNight = isNight(hour, sr, ss)
       this.current = {
         ...now,
-        icon: getIconNameByCode(now.cond_code, isNight(hour, sr, ss))
+        icon: getIconNameByCode(now.cond_code, _isNight)
       }
 
       if (weatherData) {
@@ -315,8 +343,35 @@ export default {
       const { forecast_1h: hourly, forecast_24h: weekly } = forecasts
       console.log('for', hourly)
       console.log(Object.values(hourly).reduce((a, b) => [...a, b], []))
-      const hour24 = Object.values(hourly).reduce((a, b) => [...a, b], []).slice(0, 24).map(v => { return Object.assign(...v, { weather_code: getIconNameByCode(v.weather_code, isNight(hour, sr, ss)) }) })
-      const week7 = Object.values(weekly).reduce((a, b) => [...a, b], [])
+      const getHour24 = () => {
+        return Object.values(hourly)
+          .reduce((a, b) => [...a, b], [])
+          .slice(0, 24)
+          .map(v => {
+            return Object.assign(
+              v,
+              {
+                update_time: `${v.update_time.slice(8, 10)}:00`,
+                weather_code: getIconNameByCode(v.weather_code, _isNight)
+              }
+            )
+          })
+      }
+      const getWeek7 = () => {
+        return Object.values(weekly)
+          .reduce((prev, cur) => [...prev, cur], [])
+          .map(v => {
+            return Object.assign(
+              v,
+              {
+                day_weather_code: getIconNameByCode(v.day_weather_code, _isNight),
+                night_weather_code: getIconNameByCode(v.night_weather_code, _isNight)
+              }
+            )
+          })
+      }
+      const hour24 = getHour24()
+      const week7 = getWeek7()
       this.hourly = hour24
       this.weekly = week7
     }
@@ -333,11 +388,13 @@ export default {
   display: flex;
   flex-direction: column;
 }
+.container {
+  padding-bottom: 20rpx;
+}
 .current {
   height: 560rpx;
   overflow: hidden;
   position: relative;
-  border: 1px solid #000;
   .loc {
     text-align: center;
     font-size: 26rpx;
@@ -439,11 +496,90 @@ export default {
   }
 }
 .forecast {
-  background-color: #62aadc;
+  // background-color: #62aafc;
+  // background: transparent;
   .forecast-hour-container {
     background: rgba(0, 0, 0, .1);
     overflow: hidden;
     width: 100%;
+  }
+}
+
+.forecast-hour-container {
+  .scroll-x {
+    position: relative;
+    width: 2784rpx;
+    padding: 40rpx 0;
+    height: 150rpx;
+  }
+  .item {
+    .flex-column();
+    text-align: center;
+    width: 116rpx;
+    float: left;
+  }
+  .icon {
+    display: block;
+    line-height: 80rpx;
+  }
+  .time,
+  .tmp {
+    line-height: 40rpx;
+    height: 40rpx;
+    position: relative;
+  }
+}
+
+.week {
+  position: relative;
+  padding: 40rpx 0;
+  min-height: 200rpx;
+  .week-weather {
+    .flex-row();
+    text-align: center;
+    .item:first-child {
+      color: #e0e0e0;
+    }
+    .item {
+      flex: 1;
+      .day,
+      .date,
+      .wind {
+        color: #efefef;
+      }
+      .wind {
+        font-size: 24rpx;
+        line-height: 24rpx;
+        height: 24rpx;
+        width: 80rpx;
+        margin: 0 auto 12rpx;
+        overflow: hidden;
+      }
+      .date {
+        margin: 10rpx 0 30rpx;
+        font-size: 24rpx;
+      }
+      .weather-text {
+        margin-bottom: 30rpx;
+      }
+      .night {
+        margin-top: 272rpx;
+      }
+      .night .weather-text {
+        margin: 32rpx 0 30rpx;
+      }
+    }
+  }
+  .week-chart {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 272rpx;
+    top: 262rpx; // background: white;
+  }
+  .week-chart canvas {
+    width: 750rpx;
+    height: 272rpx;
   }
 }
 </style>

@@ -59,7 +59,19 @@
         </div>
         </div>
       </div>
-      <!--  -->
+      <!-- 逐小时天气与七天天气预报 -->
+      <div class="forecast">
+        <div class="forecast-hour-container">
+          <scroll-view scroll-x>
+            <div class="scroll-x">
+              <div class="item" v-for="(item, idx) in hourly" :key="idx">
+                <div class="time">{{ item.update_time }}</div>
+                <w-icon :type="item.weather_code"></w-icon>
+              </div>
+            </div>
+          </scroll-view>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -303,7 +315,7 @@ export default {
       const { forecast_1h: hourly, forecast_24h: weekly } = forecasts
       console.log('for', hourly)
       console.log(Object.values(hourly).reduce((a, b) => [...a, b], []))
-      const hour24 = Object.values(hourly).reduce((a, b) => [...a, b], []).slice(0, 24)
+      const hour24 = Object.values(hourly).reduce((a, b) => [...a, b], []).slice(0, 24).map(v => { return Object.assign(...v, { weather_code: getIconNameByCode(v.weather_code, isNight(hour, sr, ss)) }) })
       const week7 = Object.values(weekly).reduce((a, b) => [...a, b], [])
       this.hourly = hour24
       this.weekly = week7
@@ -424,6 +436,14 @@ export default {
       float: right;
       margin-right: 30rpx;
     }
+  }
+}
+.forecast {
+  background-color: #62aadc;
+  .forecast-hour-container {
+    background: rgba(0, 0, 0, .1);
+    overflow: hidden;
+    width: 100%;
   }
 }
 </style>

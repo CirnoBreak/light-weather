@@ -72,6 +72,11 @@ export default {
     })
     this.getLocation()
   },
+  // 下拉刷新重新加载数据
+  async onPullDownRefresh() {
+    await this.getWeather()
+    wx.stopPullDownRefresh()
+  },
   computed: {
     humidity () {
       let h = this.current.hum

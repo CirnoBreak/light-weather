@@ -95,7 +95,7 @@
           </div>
           <!-- 一周温度走势图 -->
           <div class="week-chart">
-            <canvas canvas-id="chart" id="chart"></canvas>
+            <mpvue-echarts lazyload :echarts="echarts" :onInit="handleInit" ref="echarts"/>
           </div>
         </div>
       </div>
@@ -120,10 +120,16 @@ import {
   getTips
 } from '@/utils/'
 import WIcon from '@/components/icon/icon.vue'
+import { getChartConfig } from '@/utils/weather.js'
+import * as echarts from 'echarts/dist/echarts.simple.min'
+import mpvueEcharts from 'mpvue-echarts'
+
+let chart = null
 
 export default {
   components: {
-    WIcon
+    WIcon,
+    mpvueEcharts
   },
   data () {
     return {
@@ -154,7 +160,8 @@ export default {
         weather: ''
       },
       hourly: [],
-      weekly: []
+      weekly: [],
+      echarts
     }
   },
   onLoad () {
@@ -302,6 +309,7 @@ export default {
       const tomorrow = getData(tomorrowData)
       this.today = today
       this.tomorrow = tomorrow
+      this.daily = dailyForcast
     },
 
     /**
@@ -374,6 +382,27 @@ export default {
       const week7 = getWeek7()
       this.hourly = hour24
       this.weekly = week7
+      this.onInit = this.initChart
+      this.$refs.echarts.init()
+    },
+
+    handleInit (canvas) {
+      const scale = this.scale
+      const chartHeight = 272 / 2
+      const height = chartHeight * scale
+      const width = this.width
+      const weeklyData = this.weekly
+
+      chart = echarts.init(canvas, null, {
+        width: width,
+        height: height + 80
+      })
+
+      canvas.setChart(chart)
+
+      chart.setOption(getChartConfig(weeklyData))
+
+      return chart
     }
   }
 }
@@ -574,12 +603,12 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    height: 272rpx;
-    top: 262rpx; // background: white;
+    height: 286rpx;
+    top: 233rpx;
   }
   .week-chart canvas {
     width: 750rpx;
-    height: 272rpx;
+    height: 286rpx;
   }
 }
 </style>

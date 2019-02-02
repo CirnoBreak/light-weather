@@ -15,6 +15,31 @@ export function isNight (hour, sr, ss) {
   }
   return isNight
 }
+
+const dateName = ['周一', '周二', '周三', '周四', '周五', '周六', '周日', '周一', '周二', '周三', '周四', '周五', '周六', '周日']
+
+/**
+ * 把当前日期转换成对应的星期几
+ * @param {number} index 数组索引
+ */
+export function formatWeeklyDate (index) {
+  const now = new Date()
+  const threeDay = ['昨天', '今天', '明天']
+  const curDate = now.getDay()
+  if (threeDay[index]) {
+    return threeDay[index]
+  }
+  return dateName[curDate + index - 1]
+}
+
+/**
+ * 把xxxx-xx-xx(年-月-日)转成xx/xx(月/日)
+ * @param {stromg} date 日期
+ */
+export function formatDate (date) {
+  return date.split('-').slice(1).join('/')
+}
+
 /**
  * 获取aqi对应的空气质量颜色
  * @param {number} aqi 空气质量指数

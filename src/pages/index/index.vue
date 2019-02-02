@@ -79,8 +79,8 @@
         <div class="week">
           <div class="week-weather">
             <div class="item" v-for="(item, index) in weekly" :key="index">
-              <div class="day">今天</div>
-              <div class="date">01/30</div>
+              <div class="day">{{ item.date }}</div>
+              <div class="date">{{ item.time }}</div>
               <div class="daytime">
                 <div class="weather-text">{{item.day_weather}}</div>
                 <w-icon :type="item.day_weather_code"></w-icon>
@@ -117,10 +117,12 @@ import {
   airBackgroundColor,
   getIconNameByCode,
   isNight,
-  getTips
+  getTips,
+  formatWeeklyDate,
+  formatDate
 } from '@/utils/'
 import WIcon from '@/components/icon/icon.vue'
-import { getChartConfig } from '@/utils/weather.js'
+import { getChartConfig } from '@/utils/chart.js'
 import * as echarts from 'echarts/dist/echarts.simple.min'
 import mpvueEcharts from 'mpvue-echarts'
 
@@ -368,12 +370,14 @@ export default {
       const getWeek7 = () => {
         return Object.values(weekly)
           .reduce((prev, cur) => [...prev, cur], [])
-          .map(v => {
+          .map((v, idx, arr) => {
             return Object.assign(
               v,
               {
                 day_weather_code: getIconNameByCode(v.day_weather_code, _isNight),
-                night_weather_code: getIconNameByCode(v.night_weather_code, _isNight)
+                night_weather_code: getIconNameByCode(v.night_weather_code, _isNight),
+                date: formatWeeklyDate(idx),
+                time: formatDate(v.time)
               }
             )
           })
@@ -571,11 +575,11 @@ export default {
     }
     .item {
       flex: 1;
-      .day,
-      .date,
-      .wind {
-        color: #efefef;
-      }
+      // .day,
+      // .date,
+      // .wind {
+      //   color: #efefef;
+      // }
       .wind {
         font-size: 24rpx;
         line-height: 24rpx;

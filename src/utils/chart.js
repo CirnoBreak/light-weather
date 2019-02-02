@@ -1,3 +1,7 @@
+/**
+ * 处理图表数据
+ * @param {object} data 八天的天气预报数据
+ */
 export const getChartData = (data) => {
   let dates = []
   let maxTmpArr = []
@@ -18,11 +22,15 @@ export const getChartData = (data) => {
   }
 }
 
+/**
+ * 图表配置
+ * @param {object} data 图表数据
+ */
 export const getChartConfig = (data) => {
   data = getChartData(data)
   return {
     backgroundColor: 'transparent',
-    color: ['#FFB74D', '#4FC3F7'],
+    color: ['#FFB74E', '#4FC3F6'],
     tooltip: {
       show: true,
       trigger: 'axis'

@@ -124,7 +124,7 @@ export default {
       wx.getStorage({
         key: 'dataCache',
         success: ({ data }) => {
-          if (data && typeof data !== 'string' && !(data instanceof ArrayBuffer) && !isUpdate) {
+          if (data && typeof data !== 'string' && !(data instanceof ArrayBuffer)) {
             const { current, today, tomorrow, address } = data
             this.current = current
             this.today = today

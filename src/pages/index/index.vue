@@ -62,7 +62,7 @@
       </div>
     </div>
     <!-- 逐小时天气与七天天气预报 -->
-    <div class="forecast">
+    <div class="weather">
       <!-- 逐小时天气预报 -->
       <div class="forecast-hour-container">
         <scroll-view scroll-x>
@@ -97,6 +97,18 @@
           <!-- 一周温度走势图 -->
           <div class="week-chart">
             <mpvue-echarts lazyload :echarts="echarts" :onInit="handleInit" ref="echarts"/>
+          </div>
+        </div>
+      </div>
+      <!-- 生活指数 -->
+      <div class="life-style-container">
+        <div class="life-style">
+          <div class="item" v-for="(item, index) in lifestyle" :key="index">
+            <div class="title">
+              <w-icon :type="item.icon"></w-icon>
+              <span style="margin-left: -25rpx;">{{item.name}}</span>
+            </div>
+            <div class="content">{{item.info}}</div>
           </div>
         </div>
       </div>

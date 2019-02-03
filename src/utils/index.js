@@ -70,6 +70,59 @@ export function getTips () {
   const ranIdx = Math.floor((Math.random() * list.length))
   return list[ranIdx]
 }
+
+/**
+ * 转换生活指数相关数据
+ * @param {Array} data 生活指数数据
+ */
+export function getLifeStyle (data) {
+  let arr = []
+  const map = {
+      cw: {
+        icon: 'xichezhishu',
+        name: '洗车'
+      },
+      sport: {
+        icon: 'yundongzhishu',
+        name: '运动'
+      },
+      flu: {
+        icon: 'ganmao',
+        name: '感冒'
+      },
+      uv: {
+        icon: 'ziwaixian',
+        name: '紫外线强度'
+      },
+      drsg: {
+        icon: 'liangshai',
+        name: '穿衣'
+      },
+      air: {
+        icon: 'beikouzhao',
+        name: '污染扩散'
+      },
+
+      trav: {
+        icon: 'fangshai',
+        name: '旅游'
+      },
+      comf: {
+        icon: 'guominzhishu',
+        name: '舒适度'
+      }
+    }
+    data.map((v) => {
+      let t = map[v.type]
+      arr.push({
+        name: t.name,
+        icon: t.icon,
+        info: v.brf,
+        detail: v.txt
+      })
+    })
+    return arr
+}
 /**
  * 获取实况天气状况代码对应的图标
  * @param {number} code 实况天气代码

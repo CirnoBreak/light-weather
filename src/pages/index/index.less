@@ -130,7 +130,7 @@
     }
   }
 }
-.forecast {
+.weather {
   background-color:  #62aadc;
   // background: transparent;
   .forecast-hour-container {
@@ -203,7 +203,7 @@
         font-size: 25rpx;
       }
       .night {
-        margin-top: 202rpx;
+        margin-top: 152rpx;
       }
       .night .weather-text {
         margin: 32rpx 0 30rpx;
@@ -220,5 +220,36 @@
   .week-chart canvas {
     width: 750rpx;
     height: 286rpx;
+  }
+}
+
+.life-style {
+  .flex-row();
+  background: rgba(0, 0, 0, .1);
+  margin-top: -30rpx;
+  flex-wrap: wrap;
+  .item {
+    float: left;
+    text-align: center;
+    width: 25%;
+    height: 188rpx;
+    border-right: 2rpx solid rgba(255, 255, 255, .1);
+    border-bottom: 2rpx solid rgba(255, 255, 255, .1);
+    box-sizing: border-box;
+    padding: 50rpx 0 0;
+  }
+  .content {
+    font-size: 36rpx;
+    margin-top: 20rpx;
+  }
+  .title {
+    color: #fff;
+    opacity: 0.7;
+    font-size: 24rpx;
+    height: 24rpx;
+    line-height: 24rpx;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10rpx;
   }
 }

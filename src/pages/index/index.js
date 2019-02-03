@@ -13,7 +13,8 @@ import {
   isNight,
   getTips,
   formatWeeklyDate,
-  formatDate
+  formatDate,
+  getLifeStyle
 } from '@/utils/'
 import WIcon from '@/components/icon/icon.vue'
 import { getChartConfig } from '@/utils/chart.js'
@@ -57,7 +58,8 @@ export default {
       },
       hourly: [],
       weekly: [],
-      echarts
+      echarts,
+      lifestyle: []
     }
   },
   onLoad () {
@@ -210,7 +212,6 @@ export default {
       const tomorrow = getData(tomorrowData)
       this.today = today
       this.tomorrow = tomorrow
-      this.daily = dailyForcast
     },
 
     /**
@@ -229,7 +230,8 @@ export default {
       // 空气质量数据
       const { HeWeather6: airData } = airRes.data
       // 现在的天气数据、天气预报
-      const { now, daily_forecast: dailyForcast } = weatherData[0]
+      const { now, daily_forecast: dailyForcast, lifestyle } = weatherData[0]
+      this.lifestyle = getLifeStyle(lifestyle)
       // 今天的日出日落时间
       const { sr, ss } = dailyForcast[0]
       // 现在的时间(时)

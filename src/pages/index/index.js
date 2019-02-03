@@ -72,13 +72,13 @@ export default {
         this.paddingTop = res.statusBarHeight + 12
       }
     })
+    this.setDataFromCache()
     this.getLocation()
   },
   // 下拉刷新重新加载数据
   async onPullDownRefresh() {
     await this.getWeather()
     wx.stopPullDownRefresh()
-    this.$refs.echarts.init()
   },
   computed: {
     humidity () {
@@ -103,6 +103,35 @@ export default {
       wx.showLoading({
         title: text,
         mask: true
+      })
+    },
+
+    // 缓存数据
+    setCache () {
+      wx.setStorage({
+        key: 'dataCache',
+        data: {
+          current: this.current,
+          today: this.today,
+          tomorrow: this.tomorrow,
+          address: this.address
+        }
+      })
+    },
+
+    // 设置从缓存读取的数据
+    setDataFromCache () {
+      wx.getStorage({
+        key: 'dataCache',
+        success: ({ data }) => {
+          if (data && typeof data !== 'string' && !(data instanceof ArrayBuffer) && !isUpdate) {
+            const { current, today, tomorrow, address } = data
+            this.current = current
+            this.today = today
+            this.tomorrow = tomorrow
+            this.address = address
+          }
+        }
       })
     },
 
@@ -147,7 +176,6 @@ export default {
         } = res
 
         /* eslint-disable */
-        console.log(res)
         // 地址描述跟位置描述
         let {
           address,
@@ -181,7 +209,6 @@ export default {
         this.district = district
         this.address = address
         this.getWeather()
-        console.log('ok')
       } catch (e) {
         this.address = '北京市海淀区'
       }
@@ -247,14 +274,10 @@ export default {
         this.getTwoDay(weatherData[0])
       }
 
-      console.log(weatherData)
-      console.log(airRes)
       const air = airData[0]['air_now_city']
       this.air = { ...air, color: airBackgroundColor(air.aqi) }
       const { data: { data: forecasts } } = forecastRes
       const { forecast_1h: hourly, forecast_24h: weekly } = forecasts
-      console.log('for', hourly)
-      console.log(Object.values(hourly).reduce((a, b) => [...a, b], []))
       const getHour24 = () => {
         return Object.values(hourly)
           .reduce((a, b) => [...a, b], [])
@@ -290,6 +313,7 @@ export default {
       this.weekly = week7
       this.onInit = this.initChart
       this.$refs.echarts.init()
+      this.setCache()
     },
 
     handleInit (canvas) {

@@ -1,6 +1,6 @@
 {
-  "name": "light-weather",
-  "version": "1.0.0",
+  "name": "lite-weather",
+  "version": "0.0.1",
   "mpvueTemplateProjectVersion": "0.0.1",
   "description": "A weather mini program base on Mpvue.",
   "author": "CirnoBreak <1103054869@qq.com>",

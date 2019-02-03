@@ -6,6 +6,21 @@
   display: flex;
   flex-direction: column;
 }
+.bg {
+  background: lightskyblue;
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+.wrapper {
+  color: #fff;
+}
 .container {
   padding-bottom: 20rpx;
 }
@@ -91,10 +106,12 @@
   position: relative;
   top: 75%;
   bottom: 0;
+  margin-top: 20rpx;
   margin-bottom: 0;
   .item {
     width: 50%;
-    border-right: 1px solid #ccc;
+    border-right: 3rpx solid rgba(255, 255, 255, .5);
+    font-size: 28rpx;
     &:last-child {
       border-right: none;
     }
@@ -114,10 +131,11 @@
   }
 }
 .forecast {
-  // background-color: #62aafc;
+  background-color:  #62aadc;
   // background: transparent;
   .forecast-hour-container {
     background: rgba(0, 0, 0, .1);
+    // background: #fff;
     overflow: hidden;
     width: 100%;
   }
@@ -144,15 +162,18 @@
   .tmp {
     line-height: 40rpx;
     height: 40rpx;
+    font-size: 28rpx;
     position: relative;
   }
 }
 
 .week {
   position: relative;
-  padding: 40rpx 0;
+  padding: 50rpx 0;
+  margin-top: -30rpx;
   min-height: 200rpx;
   .week-weather {
+    background: rgba(0, 0, 0, .1);
     .flex-row();
     text-align: center;
     .item:first-child {
@@ -160,28 +181,29 @@
     }
     .item {
       flex: 1;
-      // .day,
-      // .date,
-      // .wind {
-      //   color: #efefef;
-      // }
+      .day,
+      .date,
       .wind {
-        font-size: 24rpx;
-        line-height: 24rpx;
-        height: 24rpx;
+        color: #efefef;
+      }
+      .wind {
+        font-size: 23rpx;
+        line-height: 23rpx;
+        height: 23rpx;
         width: 80rpx;
-        margin: 0 auto 12rpx;
+        margin: 0 auto 32rpx;
         overflow: hidden;
       }
-      .date {
-        margin: 10rpx 0 30rpx;
+      .day, .date {
+        margin: 35rpx 0 30rpx;
         font-size: 24rpx;
       }
       .weather-text {
         margin-bottom: 30rpx;
+        font-size: 25rpx;
       }
       .night {
-        margin-top: 272rpx;
+        margin-top: 202rpx;
       }
       .night .weather-text {
         margin: 32rpx 0 30rpx;

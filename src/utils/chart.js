@@ -69,6 +69,7 @@ export const getChartConfig = (data) => {
       name: '最高温度',
       type: 'line',
       smooth: true,
+      symbol: 'circle',
       data: data.maxTmpArr,
       label: {
         normal: {
@@ -81,6 +82,7 @@ export const getChartConfig = (data) => {
       name: '最低温度',
       type: 'line',
       smooth: true,
+      symbol: 'circle',
       data: data.minTmpArr,
       label: {
         normal: {

@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    <div class="bg"></div>
     <div class="container" :style="{ paddingTop: paddingTop + 'px' }">
       <!-- 实时天气 -->
       <div class="current">

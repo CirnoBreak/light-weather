@@ -32,7 +32,7 @@ export default {
     return {
       userInfo: {},
       address: '定位中', // 定位的地址,用于显示
-      province: '', // 定位的省份
+      province: '北京', // 定位的省份
       city: '北京', // 定位的城市
       district: '', // 定位的县
       lat: 39.98296, // 默认纬度
@@ -78,6 +78,7 @@ export default {
   async onPullDownRefresh() {
     await this.getWeather()
     wx.stopPullDownRefresh()
+    this.$refs.echarts.init()
   },
   computed: {
     humidity () {
